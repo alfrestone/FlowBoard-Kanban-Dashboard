@@ -4,9 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="js/api.js" defer></script>
-    <script src="js/app.js" defer></script>
-    <script src="js/ui.js" defer></script>
+    <script type="module" src="js/app.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
 
@@ -45,13 +43,10 @@
         <button id="btn-reset" class="btn btn-ghost">Réinitialiser</button>
     </section>
 
-    <!-- LOADING (Search "Loading" on DaisyUI) -->
-    <div id="state-loading" class="hidden flex justify-center p-8" hidden>
+    <div id="state-loading" class="hidden flex justify-center p-8">
         <span class="loading loading-spinner loading-lg"></span>
     </div>
 
-    <!-- ERROR (Search "Alert" on DaisyUI) -->
-    <!-- Wrapper that hides it -->
     <div id="state-error" class="hidden max-w-lg mx-auto my-4">
         <div role="alert" class="alert alert-error">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0 stroke-current" fill="none"
@@ -66,14 +61,13 @@
         </div>
     </div>
 
-    <!-- LES 3 COLONNES -->
-    <main id="board" class="grid grid-cols-3 gap-4 p-4">
+    <main id="board" class="hidden grid grid-cols-3 gap-4 p-4">
         <section class="bg-base-200 p-4 rounded-xl">
             <div class="flex justify-between mb-4">
                 <h2 class="font-bold">To Do</h2>
                 <span id="count-todo" class="badge">0</span>
             </div>
-            <!-- JS will drop "todo" cards inside this empty div -->
+
             <div id="col-todo" class="flex flex-col gap-3"></div>
         </section>
 
@@ -82,7 +76,7 @@
                 <h2 class="font-bold">In Progress</h2>
                 <span id="count-in-progress" class="badge">0</span>
             </div>
-            <!-- JS will drop "in-progress" cards inside this empty div -->
+
             <div id="col-in-progress" class="flex flex-col gap-3"></div>
         </section>
 
@@ -91,14 +85,13 @@
                 <h2 class="font-bold">Done</h2>
                 <span id="count-done" class="badge">0</span>
             </div>
-            <!-- JS will drop "done" cards inside this empty div -->
+
             <div id="col-done" class="flex flex-col gap-3"></div>
         </section>
 
-        <!-- Open the modal using ID.showModal() method -->
         <dialog id="modal_add_card" class="modal">
             <div class="modal-box">
-                <h3 class="font-bold text-lg mb-3">Nouvelle carte</h3>
+                <h3 class="font-bold text-lg py-6">Nouvelle carte</h3>
                 <form id="form-add-card" class="flex flex-col gap-3">
                     <input id="input-title" type="text" placeholder="Titre" class="input input-bordered" />
                     <textarea id="input-description" class="textarea textarea-bordered"
