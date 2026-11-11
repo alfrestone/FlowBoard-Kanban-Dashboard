@@ -1,5 +1,5 @@
-import { fetcher_api } from "/js/api.js";
-import { card_lister, cards_state } from "/js/ui.js";
+import { fetcher_api } from "./js/api.js";
+import { card_lister, cards_state } from "./js/ui.js";
 
 const state_cards = {
     cards: []
