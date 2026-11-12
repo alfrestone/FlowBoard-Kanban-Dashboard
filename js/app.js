@@ -48,6 +48,11 @@ document.getElementById('form-add-card').addEventListener('submit', function (ev
     let tags = document.getElementById("input-tags");
     let error_msg = document.getElementById("form-error");
 
+    let today_date = new Date();
+    today_date.setHours(0,0,0,0);
+    
+    let actual_duedate = new Date(duedate.value);
+
     if (!regex_title.test(title.value.trim())) {
         title.classList.add("outline", "outline-2", "outline-red-500");
         error_msg.textContent = "Titre invalide (3 à 100 caractères).";
@@ -88,7 +93,7 @@ document.getElementById('form-add-card').addEventListener('submit', function (ev
     }
     assignee.classList.remove("outline", "outline-2", "outline-red-500");
 
-    if (!regex_duedate.test(duedate.value)) {
+    if (!regex_duedate.test(duedate.value) || today_date > actual_duedate) {
         duedate.classList.add("outline", "outline-2", "outline-red-500");
         error_msg.textContent = "Date invalide (choisissez une date).";
         error_msg.classList.remove("hidden");
