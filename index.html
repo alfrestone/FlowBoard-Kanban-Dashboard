@@ -34,12 +34,14 @@
 
         <select id="filter-priority" class="select select-bordered">
             <option value="">Toutes</option>
-            <option value="low">low</option>
-            <option value="medium">medium</option>
-            <option value="high">high</option>
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
         </select>
 
-        <input id="filter-assignee" type="text" placeholder="Assigné à..." class="input input-bordered" />
+        <select id="filter-assignee" class="select select-bordered">
+            <option value="">Tous</option>
+        </select>
         <button id="btn-reset" class="btn btn-ghost">Réinitialiser</button>
     </section>
 
@@ -60,6 +62,9 @@
             </div>
         </div>
     </div>
+    <p id="state-empty" class="hidden text-center p-8 text-lg opacity-70">
+        Aucune carte ne correspond à vos filtres
+    </p>
 
     <main id="board" class="hidden grid grid-cols-3 gap-4 p-4">
         <section class="bg-base-200 p-4 rounded-xl">

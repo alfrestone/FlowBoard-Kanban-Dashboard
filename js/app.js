@@ -8,7 +8,11 @@ const state_cards = {
 function card_page_loader() {
     cards_state("loading");
 
-    fetcher_api()
+    let filter_priority_element = document.getElementById('filter-priority').value;
+    let filter_assignee = document.getElementById('filter-assignee').value;
+    let filter_search =  document.getElementById('filter-search').value;
+
+    fetcher_api(filter_priority_element, filter_assignee, filter_search)
         .then(data => {
             console.log("The cards are loaded, boss.", state_cards);
             state_cards.cards = data;
@@ -117,3 +121,12 @@ document.getElementById('form-add-card').addEventListener('submit', function (ev
     event.target.reset();
     document.getElementById("modal_add_card").close();
 })
+document.getElementById("btn-reset").addEventListener("click", function() {
+    document.getElementById('filter-priority').value = "";
+    document.getElementById('filter-assignee').value = "";
+    document.getElementById('filter-search').value = "";
+    card_page_loader();
+});
+document.getElementById('filter-priority').addEventListener('input', card_page_loader);
+document.getElementById('filter-assignee').addEventListener('input', card_page_loader);
+document.getElementById('filter-search').addEventListener('input', card_page_loader);
