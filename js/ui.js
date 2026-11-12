@@ -1,3 +1,4 @@
+let already_seen_names = [];
 export function card_lister(cards) {
 	let count_todo = 0;
 	let count_progress = 0;
@@ -6,10 +7,21 @@ export function card_lister(cards) {
 	let col_todo_element = document.getElementById('col-todo');
 	let col_in_progress = document.getElementById('col-in-progress');
 	let col_done_element = document.getElementById('col-done');
+	let select_assignee = document.getElementById('filter-assignee');
+
 
 	col_todo_element.textContent = "";
 	col_in_progress.textContent = "";
 	col_done_element.textContent = "";
+
+		let empty_msg = document.getElementById("state-empty");
+
+		if (cards.length === 0) {
+			empty_msg.classList.remove("hidden");
+		} else {
+			empty_msg.classList.add("hidden");
+		}
+
 
 	cards.forEach(card => {
 		console.log(card.status);
@@ -44,6 +56,14 @@ export function card_lister(cards) {
 		else if (card.status === "done") {
 			col_done_element.appendChild(card_holder);
 			count_done++;
+		}
+
+		if (already_seen_names.includes(card.assignee) === false) {
+			already_seen_names.push(card.assignee);
+
+			let options_element = document.createElement("option");
+			options_element.textContent = card.assignee;
+			select_assignee.appendChild(options_element);
 		}
 	});
 
