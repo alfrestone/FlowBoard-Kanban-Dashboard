@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script type="module" src="./js/app.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
+
+    <title>FlowBoard</title>
+</head>
+
+<body>
+
+    <header class="flex justify-between items-center p-4">
+        <div class="navbar bg-base-100 shadow-sm max-w-80%">
+            <a class="btn btn-ghost text-xl">FlowBoard</a>
+        </div>
+        <button id="btn-open-modal" class="btn btn-primary" onclick="modal_add_card.showModal()">+ Nouvelle
+            carte</button>
+    </header>
+
+    <section class="flex gap-2 p-4">
+        <label class="input input-bordered flex items-center gap-2">
+            <svg class="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <g stroke-linejoin="round" stroke-linecap="round" stroke-width="2.5" fill="none" stroke="currentColor">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="m21 21-4.3-4.3"></path>
+                </g>
+            </svg>
+            <input id="filter-search" type="search" placeholder="Search" />
+        </label>
+
+        <select id="filter-priority" class="select select-bordered">
+            <option value="">Toutes</option>
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+        </select>
+
+        <select id="filter-assignee" class="select select-bordered">
+            <option value="">Tous</option>
+        </select>
+        <button id="btn-reset" class="btn btn-ghost">Réinitialiser</button>
+    </section>
+
+    <div id="state-loading" class="hidden flex justify-center p-8">
+        <span class="loading loading-spinner loading-lg"></span>
+    </div>
+
+    <div id="state-error" class="hidden max-w-lg mx-auto my-4">
+        <div role="alert" class="alert alert-error">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0 stroke-current" fill="none"
+                viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <div class="flex w-full items-center justify-between gap-4">
+                <span id="error-message">Impossible de charger les cartes.</span>
+                <button id="btn-retry" type="button" class="btn btn-sm">Réessayer</button>
+            </div>
+        </div>
+    </div>
+    <p id="state-empty" class="hidden text-center p-8 text-lg opacity-70">
+        Aucune carte ne correspond à vos filtres
+    </p>
+
+    <main id="board" class="hidden grid grid-cols-3 gap-4 p-4">
+        <section class="bg-base-200 p-4 rounded-xl">
+            <div class="flex justify-between mb-4">
+                <h2 class="font-bold">To Do</h2>
+                <span id="count-todo" class="badge">0</span>
+            </div>
+
+            <div id="col-todo" class="flex flex-col gap-3"></div>
+        </section>
+
+        <section class="bg-base-200 p-4 rounded-xl">
+            <div class="flex justify-between mb-4">
+                <h2 class="font-bold">In Progress</h2>
+                <span id="count-in-progress" class="badge">0</span>
+            </div>
+
+            <div id="col-in-progress" class="flex flex-col gap-3"></div>
+        </section>
+
+        <section class="bg-base-200 p-4 rounded-xl">
+            <div class="flex justify-between mb-4">
+                <h2 class="font-bold">Done</h2>
+                <span id="count-done" class="badge">0</span>
+            </div>
+
+            <div id="col-done" class="flex flex-col gap-3"></div>
+        </section>
+
+        <dialog id="modal_add_card" class="modal">
+            <div class="modal-box">
+                <h3 class="font-bold text-lg py-6">Nouvelle carte</h3>
+                <form id="form-add-card" class="flex flex-col gap-3">
+                    <input id="input-title" type="text" placeholder="Titre" class="input input-bordered" />
+                    <textarea id="input-description" class="textarea textarea-bordered"
+                        placeholder="Description"></textarea>
+
+                    <select id="input-status" class="select select-bordered">
+                        <option value="todo">todo</option>
+                        <option value="in-progress">in-progress</option>
+                        <option value="done">done</option>
+                    </select>
+
+                    <select id="input-priority" class="select select-bordered">
+                        <option value="low">low</option>
+                        <option value="medium">medium</option>
+                        <option value="high">high</option>
+                    </select>
+
+                    <input id="input-assignee" type="text" placeholder="Assigné à" class="input input-bordered" />
+                    <input id="input-duedate" type="date" class="input input-bordered">
+                    <input id="input-tags" type="text" placeholder="Tags (ex: front, api)" class="input input-bordered">
+
+                    <p id="form-error" class="hidden text-error text-sm"></p>
+
+                    <button type="submit" class="btn btn-primary">Ajouter</button>
+                    <button type="button" id="btn-close-modal" class="btn"
+                        onclick="modal_add_card.close()">Annuler</button>
+                </form>
+            </div>
+        </dialog>
+    </main>
+</body>
+
+</html>
