@@ -33,3 +33,8 @@ export async function add_to_card_api(new_card) {
     let posted_data = await url_holder.post("/cards", new_card);
     return posted_data.data;
 }
+
+export async function edit_card_api(id, updated_card) {
+    let updated_data = await url_holder.put("cards/" + id, updated_card);
+    return updated_data;
+}
