@@ -25,7 +25,6 @@ export async function fetcher_api(priority = "", assignee = "", search = "") {
     }
 
     let response = await url_holder.get("/cards?" + parama)
-    console.log(response)
     return response.data;
 }
 
@@ -37,4 +36,9 @@ export async function add_to_card_api(new_card) {
 export async function edit_card_api(id, updated_card) {
     let updated_data = await url_holder.put("cards/" + id, updated_card);
     return updated_data;
+}
+
+export async function move_card_api(id, new_position) {
+    let new_status = await url_holder.patch('/cards/' + id , {status: new_position});
+    return new_status.data;
 }
