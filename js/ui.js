@@ -1,4 +1,4 @@
-import { move_card_api } from "/js/api.js";
+import { move_card_api, delete_card_api } from "/js/api.js";
 let already_seen_names = [];
 
 export const edit_mode = { id: null };
@@ -72,14 +72,44 @@ export function card_lister(cards) {
             console.log(edit_mode);
 
         })
-        card_holder.append(title, description, priority, assignee, edit_button);
+        let div_container = document.createElement('div');
+        div_container.className = "flex flex-1 gap-2"
+
+        let delete_button = document.createElement('button');
+        delete_button.textContent = "Supprimer"
+        delete_button.className = "btn btn-xs btn-error btn-outline"
+        delete_button.addEventListener('click', async function () {
+            let result = await Swal.fire({
+                title: "Supprimer cette carte ?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Supprimer",
+                cancelButtonText: "Annuler"
+            });
+            if (result.isConfirmed == true) {
+                try {
+                    await delete_card_api(card.id);
+                    cards.splice(cards.indexOf(card), 1);
+                    card_lister(cards);
+                } catch (error) {
+                    Swal.fire({
+                        title: "Erreur",
+                        text: "La suppression a échoué",
+                        icon: "error"
+                    });
+                    console.error("Error during deletion:", error);
+                }
+            }
+        })
+        card_holder.append(title, description, priority, assignee, edit_button, delete_button);
         if (card.status === "todo") {
             btn_right.addEventListener('click', async function () {
                 await move_card_api(card.id, "in-progress");
                 card.status = "in-progress";
                 card_lister(cards);
             })
-            card_holder.append(btn_right);
+            div_container.append(btn_right);
+            card_holder.append(div_container);
             col_todo_element.appendChild(card_holder);
             count_todo++;
         }
@@ -94,8 +124,6 @@ export function card_lister(cards) {
                 card.status = "todo";
                 card_lister(cards);
             })
-            let div_container = document.createElement('div');
-            div_container.className = "flex flex-1 gap-2"
             div_container.append(btn_left, btn_right)
             card_holder.append(div_container);
             col_in_progress.appendChild(card_holder);
@@ -107,7 +135,8 @@ export function card_lister(cards) {
                 card.status = "in-progress";
                 card_lister(cards);
             })
-            card_holder.append(btn_left);
+            div_container.append(btn_right);
+            card_holder.append(div_container);
             col_done_element.appendChild(card_holder);
             count_done++;
         }

@@ -42,3 +42,8 @@ export async function move_card_api(id, new_position) {
     let new_status = await url_holder.patch('/cards/' + id , {status: new_position});
     return new_status.data;
 }
+
+export async function delete_card_api(id) {
+    let delete_card = await url_holder.delete("/cards/" + id)
+    return delete_card;
+}
