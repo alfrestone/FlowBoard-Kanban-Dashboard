@@ -47,3 +47,8 @@ export async function delete_card_api(id) {
     let delete_card = await url_holder.delete("/cards/" + id)
     return delete_card;
 }
+
+export async function get_members_api() {
+    let response = await url_holder.get("/members");
+    return response.data;
+}

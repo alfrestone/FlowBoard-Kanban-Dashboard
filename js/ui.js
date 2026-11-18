@@ -1,5 +1,5 @@
 import { move_card_api, delete_card_api } from "/js/api.js";
-let already_seen_names = [];
+
 
 export const edit_mode = { id: null };
 
@@ -90,6 +90,7 @@ export function card_lister(cards) {
                 try {
                     await delete_card_api(card.id);
                     cards.splice(cards.indexOf(card), 1);
+                    show_toast("Carte supprimée !")
                     card_lister(cards);
                 } catch (error) {
                     Swal.fire({
@@ -106,6 +107,7 @@ export function card_lister(cards) {
             btn_right.addEventListener('click', async function () {
                 await move_card_api(card.id, "in-progress");
                 card.status = "in-progress";
+                show_toast("Carte déplacée !")
                 card_lister(cards);
             })
             div_container.append(btn_right);
@@ -117,11 +119,13 @@ export function card_lister(cards) {
             btn_right.addEventListener('click', async function () {
                 await move_card_api(card.id, "done");
                 card.status = "done";
+                show_toast("Carte déplacée !")
                 card_lister(cards);
             })
             btn_left.addEventListener('click', async function () {
                 await move_card_api(card.id, "todo");
                 card.status = "todo";
+                show_toast("Carte déplacée !")
                 card_lister(cards);
             })
             div_container.append(btn_left, btn_right)
@@ -133,20 +137,13 @@ export function card_lister(cards) {
             btn_left.addEventListener('click', async function () {
                 await move_card_api(card.id, "in-progress");
                 card.status = "in-progress";
+                show_toast("Carte déplacée !")
                 card_lister(cards);
             })
-            div_container.append(btn_right);
+            div_container.append(btn_left);
             card_holder.append(div_container);
             col_done_element.appendChild(card_holder);
             count_done++;
-        }
-
-        if (already_seen_names.includes(card.assignee) === false) {
-            already_seen_names.push(card.assignee);
-
-            let options_element = document.createElement("option");
-            options_element.textContent = card.assignee;
-            select_assignee.appendChild(options_element);
         }
     });
 
@@ -266,4 +263,15 @@ export function validate_form() {
         tags: tags.value.split(",")
     };
     return new_card;
+}
+
+export function show_toast(message, icon = "success") {
+    Swal.fire({
+        toast: true,
+        position: "top-end",
+        icon: icon,
+        title: message,
+        showConfirmButton: false,
+        timer: 3000,
+    })
 }
