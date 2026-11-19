@@ -11,7 +11,6 @@ export function card_lister(cards) {
     let col_todo_element = document.getElementById('col-todo');
     let col_in_progress = document.getElementById('col-in-progress');
     let col_done_element = document.getElementById('col-done');
-    let select_assignee = document.getElementById('filter-assignee');
 
 
     col_todo_element.textContent = "";
@@ -47,12 +46,18 @@ export function card_lister(cards) {
         assignee.className = "text-xs font-semibold";
         assignee.textContent = card.assignee;
 
+        let tags = document.createElement('span');
+        tags.className = "text-xs font-semibold";
+        assignee.textContent = card.tags.join(", ");
+
         let btn_left = document.createElement("button");
         let btn_right = document.createElement("button");
+
         btn_left.className = "btn btn-xs btn-outline flex-1 justify-center";
         btn_right.className = "btn btn-xs btn-outline flex-1 justify-center";
         btn_left.textContent = "←";
         btn_right.textContent = "→"
+
         let edit_button = document.createElement('button');
         edit_button.textContent = "Modifier";
         edit_button.dataset.id = card.id;
@@ -69,7 +74,6 @@ export function card_lister(cards) {
             document.getElementById('input-duedate').value = card.dueDate
             document.getElementById('input-tags').value = card.tags.join(",");
             document.getElementById("modal_add_card").showModal();
-            console.log(edit_mode);
 
         })
         let div_container = document.createElement('div');
@@ -102,7 +106,7 @@ export function card_lister(cards) {
                 }
             }
         })
-        card_holder.append(title, description, priority, assignee, edit_button, delete_button);
+        card_holder.append(title, description, priority, assignee, tags, edit_button, delete_button);
         if (card.status === "todo") {
             btn_right.addEventListener('click', async function () {
                 await move_card_api(card.id, "in-progress");

@@ -93,6 +93,10 @@ document.getElementById("form-add-card").addEventListener('submit', async functi
         document.getElementById('btn-edit-submit').classList.add("hidden");
     } catch (error) {
         console.error(error);
+        document.getElementById('btn-add-submit').disabled = false;
+        document.getElementById('btn-add-submit').textContent = "Ajouter";
+        document.getElementById("modal_add_card").close();
+        show_toast("il y a une erreur", "error");
     }
 })
 document.getElementById("btn-reset").addEventListener("click", function () {
