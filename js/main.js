@@ -1,9 +1,12 @@
 import { fetcher_api, add_to_card_api, edit_card_api, get_members_api, ai_card_generator } from "./api.js";
 import { card_lister, cards_state, validate_form, edit_mode, show_toast } from "./ui.js";
-
-const state_cards = {
-    cards: []
-}
+import {
+    state_cards,
+    save_filters, get_filters, clear_filters,
+    save_draft, get_draft, clear_draft,
+    save_theme, get_theme,
+    save_collapsed, get_collapsed
+} from "./store.js";
 
 async function card_page_loader() {
 
@@ -19,7 +22,7 @@ async function card_page_loader() {
         q: filter_search
     }
 
-    localStorage.setItem("flowboard:filters", JSON.stringify(current_filter));
+    save_filters(current_filter);
 
     try {
         let data = await fetcher_api(filter_priority_element, filter_assignee, filter_search)
@@ -41,10 +44,9 @@ async function start_app() {
         select_assignee.appendChild(the_option);
     });
 
-    let saved_filters = localStorage.getItem("flowboard:filters");
+    let unpacked_values = get_filters();
 
-    if (saved_filters !== null) {
-        let unpacked_values = JSON.parse(saved_filters);
+    if (unpacked_values !== null) {
         let { priority, assignee, q } = unpacked_values;
         document.getElementById('filter-priority').value = priority;
         document.getElementById('filter-assignee').value = assignee;
@@ -73,7 +75,7 @@ document.getElementById("form-add-card").addEventListener('submit', async functi
             add_button.disabled = false;
             add_button.textContent = "Ajouter";
             show_toast("Carte ajoutée !")
-            sessionStorage.removeItem("flowboard:draft");
+            clear_draft();
             card_lister(state_cards.cards);
         } else {
             let edit_button = document.getElementById('btn-edit-submit');
@@ -91,18 +93,30 @@ document.getElementById("form-add-card").addEventListener('submit', async functi
         document.getElementById('btn-edit-submit').classList.add("hidden");
     } catch (error) {
         console.error(error);
+        document.getElementById('btn-add-submit').disabled = false;
+        document.getElementById('btn-add-submit').textContent = "Ajouter";
+        document.getElementById("modal_add_card").close();
+        show_toast("il y a une erreur", "error");
     }
 })
 document.getElementById("btn-reset").addEventListener("click", function () {
     document.getElementById('filter-priority').value = "";
     document.getElementById('filter-assignee').value = "";
     document.getElementById('filter-search').value = "";
-    localStorage.removeItem("flowboard:filters");
+    clear_filters();
     card_page_loader();
 });
 document.getElementById('filter-priority').addEventListener('input', card_page_loader);
 document.getElementById('filter-assignee').addEventListener('input', card_page_loader);
-document.getElementById('filter-search').addEventListener('input', card_page_loader);
+
+let timer_holder = null;
+document.getElementById('filter-search').addEventListener('input', function () {
+    clearTimeout(timer_holder);
+    cards_state("loading");
+    timer_holder = setTimeout(function () {
+        card_page_loader();
+    }, 500)
+});
 
 document.getElementById('btn-open-modal').addEventListener('click', function () {
     document.getElementById("btn-add-submit").classList.remove("hidden");
@@ -110,9 +124,8 @@ document.getElementById('btn-open-modal').addEventListener('click', function () 
     document.getElementById("form-add-card").reset();
     edit_mode.id = null;
 
-    let saved_draft = sessionStorage.getItem("flowboard:draft");
-    if (saved_draft !== null) {
-        let unpacked_draft = JSON.parse(saved_draft);
+    let unpacked_draft = get_draft();
+    if ((unpacked_draft !== null)) {
         document.getElementById("input-title").value = unpacked_draft.title;
         document.getElementById("input-description").value = unpacked_draft.description;
         document.getElementById("input-status").value = unpacked_draft.status;
@@ -134,10 +147,10 @@ document.getElementById("form-add-card").addEventListener('input', function () {
             dueDate: document.getElementById("input-duedate").value,
             tags: document.getElementById("input-tags").value
         }
-        sessionStorage.setItem("flowboard:draft", JSON.stringify(current_add_draft));
+        save_draft(current_add_draft);
     }
 })
-let saved_theme = localStorage.getItem("flowboard:theme");
+let saved_theme = get_theme();
 if (saved_theme == "dark") {
     document.documentElement.setAttribute("data-theme", "dark");
     document.getElementById("btn-theme").checked = true;
@@ -146,20 +159,17 @@ let theme_button = document.getElementById("btn-theme")
 theme_button.addEventListener('click', function () {
     if (theme_button.checked == true) {
         document.documentElement.setAttribute("data-theme", "dark");
-        localStorage.setItem("flowboard:theme", "dark");
+        save_theme("dark");
     } else {
         document.documentElement.setAttribute("data-theme", "light");
-        localStorage.setItem("flowboard:theme", "light")
+        save_theme("light");
     }
 })
 
-let saved_collapsed = localStorage.getItem("flowboard:collapsed");
-if (saved_collapsed !== null) {
-    let unpacked_collapsed = JSON.parse(saved_collapsed);
-    unpacked_collapsed.forEach(col_id => {
-        document.getElementById(col_id).classList.add("hidden");
-    });
-}
+let unpacked_collapsed = get_collapsed();
+unpacked_collapsed.forEach(col_id => {
+    document.getElementById(col_id).classList.add("hidden");
+});
 
 function save_collapsed_columns() {
     let collapsed_list = [];
@@ -174,7 +184,7 @@ function save_collapsed_columns() {
         collapsed_list.push("col-done");
     }
 
-    localStorage.setItem("flowboard:collapsed", JSON.stringify(collapsed_list));
+    save_collapsed(collapsed_list);
 }
 
 document.getElementById("btn-collapse-todo").addEventListener("click", function () {
@@ -208,7 +218,7 @@ document.getElementById("form-ai").addEventListener("submit", async function (ev
         error_msg.classList.remove("hidden");
         return;
     }
-    if  (api_key === "") {
+    if (api_key === "") {
         error_msg.textContent = "La clé API Gemini est obligatoire.";
         error_msg.classList.remove("hidden");
         return;
@@ -220,7 +230,7 @@ document.getElementById("form-ai").addEventListener("submit", async function (ev
     submit_btn.disabled = true;
     submit_btn.textContent = "Génération en cours…";
 
-     try {
+    try {
         let ai_cards = await ai_card_generator(description, api_key);
 
         ai_cards.forEach(card => {
@@ -231,7 +241,7 @@ document.getElementById("form-ai").addEventListener("submit", async function (ev
         show_toast(ai_cards.length + " cartes créées !");
         event.target.reset();
         document.getElementById("modal_ai").close();
-    } 
+    }
     catch (error) {
         console.error(error);
         show_toast("Erreur lors de la génération IA", "error");
