@@ -1,4 +1,4 @@
-import { fetcher_api, add_to_card_api, edit_card_api, get_members_api } from "/js/api.js";
+import { fetcher_api, add_to_card_api, edit_card_api, get_members_api, ai_card_generator } from "/js/api.js";
 import { card_lister, cards_state, validate_form, edit_mode, show_toast } from "/js/ui.js";
 
 const state_cards = {
@@ -138,13 +138,13 @@ if (saved_theme == "dark") {
     document.getElementById("btn-theme").checked = true;
 }
 let theme_button = document.getElementById("btn-theme")
-theme_button.addEventListener('click' , function () {
+theme_button.addEventListener('click', function () {
     if (theme_button.checked == true) {
-         document.documentElement.setAttribute("data-theme", "dark");
-         localStorage.setItem("flowboard:theme","dark");
+        document.documentElement.setAttribute("data-theme", "dark");
+        localStorage.setItem("flowboard:theme", "dark");
     } else {
         document.documentElement.setAttribute("data-theme", "light");
-        localStorage.setItem("flowboard:theme","light")
+        localStorage.setItem("flowboard:theme", "light")
     }
 })
 
@@ -186,3 +186,55 @@ document.getElementById("btn-collapse-done").addEventListener("click", function 
     document.getElementById("col-done").classList.toggle("hidden");
     save_collapsed_columns();
 });
+
+document.getElementById("form-ai").addEventListener("submit", async function (event) {
+    event.preventDefault();
+
+    let desc_input = document.getElementById("input-ai-description");
+    let key_input = document.getElementById("input-ai-key");
+    let error_msg = document.getElementById("ai-form-error");
+    let submit_btn = document.getElementById("btn-ai-submit");
+
+    let description = desc_input.value.trim();
+    let api_key = key_input.value.trim();
+
+    if (description.length < 20 || description.length > 1000) {
+        error_msg.textContent = "La description doit contenir entre 20 et 1000 caractères.";
+        error_msg.classList.remove("hidden");
+        return;
+    }
+    if  (api_key === "") {
+        error_msg.textContent = "La clé API Gemini est obligatoire.";
+        error_msg.classList.remove("hidden");
+        return;
+    }
+    error_msg.classList.add("hidden");
+
+    desc_input.disabled = true;
+    key_input.disabled = true;
+    submit_btn.disabled = true;
+    submit_btn.textContent = "Génération en cours…";
+
+     try {
+        let ai_cards = await ai_card_generator(description, api_key);
+
+        ai_cards.forEach(card => {
+            state_cards.cards.push(card);
+        });
+
+        card_lister(state_cards.cards);
+        show_toast(ai_cards.length + " cartes créées !");
+        event.target.reset();
+        document.getElementById("modal_ai").close();
+    } 
+    catch (error) {
+        console.error(error);
+        show_toast("Erreur lors de la génération IA", "error");
+    }
+
+    key_input.value = "";
+    desc_input.disabled = false;
+    key_input.disabled = false;
+    submit_btn.disabled = false;
+    submit_btn.textContent = "Générer";
+})

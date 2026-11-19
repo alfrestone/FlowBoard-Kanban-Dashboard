@@ -52,3 +52,12 @@ export async function get_members_api() {
     let response = await url_holder.get("/members");
     return response.data;
 }
+
+export async function ai_card_generator(description, apiKey) {
+    let response = await url_holder.post(
+        "/ai/cards",
+        { description: description, apiKey: apiKey },
+        { timeout: 30000 }
+    );
+    return response.data;
+}
