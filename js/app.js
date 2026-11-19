@@ -243,3 +243,27 @@ document.getElementById("form-ai").addEventListener("submit", async function (ev
     submit_btn.disabled = false;
     submit_btn.textContent = "Générer";
 })
+    let new_card = {
+        title: title.value.trim(),
+        description: description.value.trim(),
+        status: status.value,
+        priority: priority.value,
+        assignee: assignee.value.trim(),
+        dueDate: duedate.value,
+        tags: tags.value.split(",")
+    };
+
+    state_cards.cards.push(new_card);
+    card_lister(state_cards.cards);
+    event.target.reset();
+    document.getElementById("modal_add_card").close();
+})
+document.getElementById("btn-reset").addEventListener("click", function() {
+    document.getElementById('filter-priority').value = "";
+    document.getElementById('filter-assignee').value = "";
+    document.getElementById('filter-search').value = "";
+    card_page_loader();
+});
+document.getElementById('filter-priority').addEventListener('input', card_page_loader);
+document.getElementById('filter-assignee').addEventListener('input', card_page_loader);
+document.getElementById('filter-search').addEventListener('input', card_page_loader);
