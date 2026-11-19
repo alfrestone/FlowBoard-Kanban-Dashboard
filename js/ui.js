@@ -1,4 +1,4 @@
-import { move_card_api, delete_card_api } from "/js/api.js";
+import { move_card_api, delete_card_api } from "./api.js";
 
 
 export const edit_mode = { id: null };

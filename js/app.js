@@ -1,5 +1,5 @@
-import { fetcher_api, add_to_card_api, edit_card_api, get_members_api, ai_card_generator } from "/js/api.js";
-import { card_lister, cards_state, validate_form, edit_mode, show_toast } from "/js/ui.js";
+import { fetcher_api, add_to_card_api, edit_card_api, get_members_api, ai_card_generator } from "./api.js";
+import { card_lister, cards_state, validate_form, edit_mode, show_toast } from "./ui.js";
 
 const state_cards = {
     cards: []
@@ -65,8 +65,13 @@ document.getElementById("form-add-card").addEventListener('submit', async functi
     }
     try {
         if (edit_mode.id === null) {
+            let add_button = document.getElementById('btn-add-submit')
+            add_button.disabled = true;
+            add_button.textContent = "Ajout en cours..."
             let saved_cards = await add_to_card_api(new_card);
             state_cards.cards.push(saved_cards);
+            add_button.disabled = false;
+            add_button.textContent = "Ajouter";
             show_toast("Carte ajoutée !")
             sessionStorage.removeItem("flowboard:draft");
             card_lister(state_cards.cards);
